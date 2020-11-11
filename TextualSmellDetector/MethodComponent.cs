@@ -5,16 +5,17 @@ using System.Text;
 
 namespace TextualSmellDetector
 {
-    class MethodComponent : ICodeComponent, IComponentLeaf
+    class MethodComponent : CodeComponent, IComponentLeaf
     {
         public string Name { get; set; }
-        public IEnumerable<ICodeComponent> Children { get; set; } = new List<ICodeComponent>();
+        public IEnumerable<string> Identifiers { get; set; }
         public IEnumerable<Term> Terms { get; set; }
+        public IDictionary<Term, int> TermDictionary { get; set; }
 
         public MethodComponent(string name, IEnumerable<string> tokens)
         {
             Name = name;
-            Terms = tokens.Select(x => new Term() { Text = x });
+            Identifiers = tokens;
         }
     }
 }

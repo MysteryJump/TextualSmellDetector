@@ -15,8 +15,9 @@ namespace TextualSmellDetector
         [STAThread]
         static void Main(string[] args)
         {
+            //Console.WriteLine(Directory.GetCurrentDirectory());
             var tree = CSharpSyntaxTree.ParseText(
-                File.ReadAllText(@"C:\Users\Kain\source\repos\TextualSmellDetector\TextualSmellDetector\Program.cs"));
+                File.ReadAllText(@"Program.cs"));
             if (tree.GetDiagnostics().Any())
             {
                 throw new InvalidOperationException();
@@ -35,15 +36,16 @@ namespace TextualSmellDetector
                     QualifiedNameSyntax qns => qns.ToString(),
                     _ => throw new InvalidOperationException()
                 };
-                var components = new List<ICodeComponent>();
+                var components = new List<CodeComponent>();
                 // in future, needs record implementation
                 // TODO: inner class
-                var classes = node.ChildNodes().Where(x => x is ClassDeclarationSyntax || x is StructDeclarationSyntax);
+                var classes = node.ChildNodes()
+                    .Where(x => x is ClassDeclarationSyntax || x is StructDeclarationSyntax);
 
                 var enums = node.ChildNodes().Where(x => x is EnumDeclarationSyntax);
                 foreach (var classNode in classes)
                 {
-                    var ls = new List<ICodeComponent>();
+                    var ls = new List<CodeComponent>();
 
                     var className = classNode.ChildTokens().First(x => x.Kind() == SyntaxKind.IdentifierToken).Text;
                     var methods = classNode.ChildNodes()
@@ -68,16 +70,20 @@ namespace TextualSmellDetector
 
                     foreach (var property in properties)
                     {
-                        var props = property.ChildNodes().First(x => x is AccessorListSyntax || x is ArrowExpressionClauseSyntax);
-                        var propName = property.ChildTokens().First(x => x.Kind() == SyntaxKind.IdentifierToken).Text;
+                        var props = property.ChildNodes()
+                            .First(x => x is AccessorListSyntax || x is ArrowExpressionClauseSyntax);
+                        var propName = property.ChildTokens()
+                            .First(x => x.Kind() == SyntaxKind.IdentifierToken).Text;
                         var getterName = $"Get{propName}";
                         var setterName = $"Set{propName}";
 
                         if (props is AccessorListSyntax als)
                         {
                             var accessors = props.ChildNodes().OfType<AccessorDeclarationSyntax>().ToList();
-                            var getter = accessors.FirstOrDefault(x => x.Kind() == SyntaxKind.GetAccessorDeclaration);
-                            var setter = accessors.FirstOrDefault(x => x.Kind() == SyntaxKind.SetAccessorDeclaration);
+                            var getter = accessors
+                                .FirstOrDefault(x => x.Kind() == SyntaxKind.GetAccessorDeclaration);
+                            var setter = accessors
+                                .FirstOrDefault(x => x.Kind() == SyntaxKind.SetAccessorDeclaration);
                             if (getter is { })
                             {
                                 var lss = GetIdentifiers(getter);
@@ -97,6 +103,8 @@ namespace TextualSmellDetector
                         }
                     }
                     var clscmp = new ClassComponent(className, ls);
+
+                    components.Add(clscmp);
                 }
 
                 foreach (var enumNodes in enums)
@@ -106,8 +114,17 @@ namespace TextualSmellDetector
                     var enumcmp = new EnumComponent(enumName, idents);
                     components.Add(enumcmp);
                 }
-                var nscomp = new NamespaceComponent(namespaceName, components);
+
+                // Blob
+
+                var classComponents = components.OfType<ClassComponent>();
+                foreach (var component in classComponents)
+                {
+                    CalculateBlobSmell(component);
+                }
+
             }
+
         }
 
         private string test;
@@ -128,12 +145,21 @@ namespace TextualSmellDetector
                     (current,
                         next) => current.Concat(next)));
             var tokens = node.ChildTokens();
-            list.AddRange(tokens.Where(x => x.Kind() == SyntaxKind.IdentifierToken && x.Text != "var").Select(x => x.Text));
+            list.AddRange(tokens.Where(x => x.Kind() == SyntaxKind.IdentifierToken && x.Text != "var")
+                .Select(x => x.Text));
 
             return list;
         }
 
-        static string GetQualifiedNamespaceName(QualifiedNameSyntax qns) => qns.ToString();
+        private static double CalculateBlobSmell(ClassComponent cmp)
+        {
+            var className = cmp.ClassName;
+            var methodComponents = cmp.Children.OfType<MethodComponent>();
+            cmp.GetMethodTermDictionary();
+            var mat = new MethodMethodLsiMatrix(cmp);
+            mat.Calculate();
+            return 3;
+        }
     }
 
     class Unko

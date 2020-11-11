@@ -5,18 +5,18 @@ using System.Text;
 
 namespace TextualSmellDetector
 {
-    class EnumComponent : ICodeComponent, IComponentLeaf
+    class EnumComponent : CodeComponent, IComponentLeaf
     {
         public string Name { get; set; }
-
-        public IEnumerable<ICodeComponent> Children { get; set; } = new List<ICodeComponent>();
 
         public EnumComponent(string name, IEnumerable<string> terms)
         {
             Name = name;
-            Terms = terms.Select(x => new Term() { Text = x });
+            Identifiers = terms;
         }
 
+        public IEnumerable<string> Identifiers { get; set; }
         public IEnumerable<Term> Terms { get; set; }
+        public IDictionary<Term, int> TermDictionary { get; set; }
     }
 }

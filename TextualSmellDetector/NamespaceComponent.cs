@@ -5,14 +5,13 @@ using System.Text;
 
 namespace TextualSmellDetector
 {
-    class NamespaceComponent : ICodeComponent
+    class NamespaceComponent : CodeComponent
     {
-        public IEnumerable<ICodeComponent> Children { get; set; }
         public string Name { get; set; }
         public string NamespaceFullName { get; set; }
         public NamespaceComponent Parent { get; set; }
 
-        public NamespaceComponent(string fullName, IEnumerable<ICodeComponent> components)
+        public NamespaceComponent(string fullName, IEnumerable<CodeComponent> components)
         {
             var split = fullName.Split('.');
             Name = split.Last();
