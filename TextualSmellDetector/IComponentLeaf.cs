@@ -23,7 +23,7 @@ namespace TextualSmellDetector
             }
 
             Terms = ls.Where(x => !StopWordsRemover.IsStopWord(x.Text));
-            TermDictionary = ls.Aggregate(new Dictionary<Term, int>(), (current, next) =>
+            TermDictionary = ls.Aggregate(new Dictionary<Term, int>(new Term()), (current, next) =>
             {
                 if (current.ContainsKey(next))
                 {
@@ -31,7 +31,7 @@ namespace TextualSmellDetector
                 }
                 else
                 {
-                    current.Add(next, 0);
+                    current.Add(next, 1);
                 }
                 return current;
             });

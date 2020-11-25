@@ -13,5 +13,6 @@ namespace TextualSmellDetector
         public bool Equals(Term x, Term y) => y != null && x != null && x.Text == y.Text;
 
         public int GetHashCode(Term obj) => obj.Text.GetHashCode();
+        public override string ToString() => Text;
     }
 }

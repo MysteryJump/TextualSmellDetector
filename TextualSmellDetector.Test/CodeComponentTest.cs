@@ -47,6 +47,7 @@ namespace TextualSmellDetector.Test
             Assert.Equal(4, split.Count);
         }
 
+
         public IEnumerable<string> Identifiers { get; set; }
         public IEnumerable<Term> Terms { get; set; }
         public IDictionary<Term, int> TermDictionary { get; set; }

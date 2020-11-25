@@ -6,18 +6,28 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MathNet.Numerics" Version="4.12.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.7.0" />
     <PackageReference Include="Porter2Stemmer" Version="1.0.0" />
     <PackageReference Include="Utf8Json" Version="1.3.7" />
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="LsiMatrix.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
     <Compile Update="Program.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Update="StopWordsRemover.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="CommonKeywords.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="StopWords.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
